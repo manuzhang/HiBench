@@ -16,12 +16,18 @@
  */
 package com.intel.hibench.streambench.gearpump.task
 
+import com.intel.hibench.streambench.common.metrics.Latency
 import org.apache.gearpump.Message
 import org.apache.gearpump.cluster.UserConfig
 import org.apache.gearpump.streaming.task.{Task, TaskContext}
 
 class Identity(taskContext: TaskContext, conf: UserConfig) extends Task(taskContext, conf) {
+
+  val latencyMetrics = new Latency("gearpump-identity")
+
   override def onNext(msg: Message): Unit = {
     taskContext.output(msg)
+    val latency = msg.timestamp - System.currentTimeMillis()
+    latencyMetrics.update(latency)
   }
 }
