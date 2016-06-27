@@ -14,30 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.intel.hibench.streambench.common.metrics
 
-package com.intel.hibench.streambench.common.metrics;
+trait LatencyReporter extends java.io.Serializable {
 
-import com.codahale.metrics.CsvReporter;
-import com.codahale.metrics.MetricFilter;
-import com.codahale.metrics.MetricRegistry;
+  def report(latency: Long): Unit
 
-import java.io.File;
-import java.util.concurrent.TimeUnit;
-
-public class FileReporter {
-
-    private final CsvReporter reporter;
-
-    public FileReporter(File file, MetricRegistry registry) {
-        this.reporter = CsvReporter.forRegistry(registry)
-                .convertRatesTo(TimeUnit.SECONDS)
-                .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .filter(MetricFilter.ALL)
-                .build(file);
-    }
-
-
-    public void report() {
-        reporter.report();
-    }
 }

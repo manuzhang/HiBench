@@ -14,22 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.intel.hibench.streambench.gearpump.application
+package com.intel.hibench.streambench.common.metrics
 
-import com.intel.hibench.streambench.common.TestCase.TestCase
-import com.intel.hibench.streambench.common.metrics.{KafkaReporter, LatencyReporter}
-import com.intel.hibench.streambench.gearpump.source.SourceProvider
-import com.intel.hibench.streambench.gearpump.util.GearpumpConfig
-import org.apache.gearpump.cluster.UserConfig
-import org.apache.gearpump.streaming.task.Task
-import org.apache.gearpump.streaming.{Processor, StreamApplication}
+import java.util.Properties
 
-abstract class BasicApplication(conf: GearpumpConfig)(implicit sourceProvider: SourceProvider){
-  val benchName: TestCase
+import org.apache.kafka.clients.producer.{ProducerRecord, KafkaProducer}
+import org.apache.kafka.common.serialization.StringSerializer
 
-  def getSource(): Processor[_ <: Task] = {
-    sourceProvider.getSourceProcessor(conf)
+class KafkaReporter(topic: String, bootstrapServers: String) extends LatencyReporter {
+
+  private val props = new Properties()
+  props.put("bootstrap.servers", bootstrapServers)
+  private val producer = new KafkaProducer(props, new StringSerializer, new StringSerializer)
+
+  override def report(latency: Long): Unit = {
+    producer.send(new ProducerRecord[String, String](topic, 0, null, s"$latency"))
   }
 
-  def application(benchConfig: UserConfig): StreamApplication
 }

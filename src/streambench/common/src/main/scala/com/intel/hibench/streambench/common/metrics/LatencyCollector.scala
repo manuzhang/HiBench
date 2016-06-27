@@ -15,9 +15,11 @@
  * limitations under the License.
  */
 
-package com.intel.hibench.streambench.common.metrics;
+package com.intel.hibench.streambench.common.metrics
 
-public class Metrics {
+trait LatencyCollector {
 
+  def start(): Unit
 
+  def stop(): Unit
 }

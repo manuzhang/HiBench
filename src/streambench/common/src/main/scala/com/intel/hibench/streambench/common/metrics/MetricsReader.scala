@@ -14,37 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.intel.hibench.streambench.common.metrics
 
-package com.intel.hibench.streambench.common.metrics;
+object MetricsReader extends App {
 
-import com.codahale.metrics.Histogram;
-import com.codahale.metrics.MetricRegistry;
+  if (args.length < 3) {
+    System.err.println("args: <zookeeperConnect> <topic> <outputFile> need to be specified!")
+    System.exit(1)
+  }
 
-public class Latency {
-    private final Histogram histogram;
-    private final MetricRegistry registry;
-    private final int sampleRate;
-    private long sampleCount = 0L;
+  val zookeeperConnect = args(0)
+  val topic = args(1)
+  val kafkaConsumer = new KafkaConsumer(zookeeperConnect, topic, 0)
 
-    public Latency(String name) {
-        this(name, 1);
-    }
-
-    public Latency(String name, int sampleRate) {
-        this.registry = new MetricRegistry();
-        this.histogram = registry.histogram(name);
-        this.sampleRate = sampleRate;
-    }
-
-    public void update(long value) {
-        sampleCount++;
-        if (sampleCount % sampleRate == 0) {
-            histogram.update(value);
-        }
-    }
-
-    public MetricRegistry getRegistry() {
-        return registry;
-    }
-
+  val outputFile = args(2)
+  val latencyCollector = new KafkaCollector(topic, kafkaConsumer, outputFile)
+  latencyCollector.start()
 }
