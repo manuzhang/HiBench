@@ -18,6 +18,6 @@ package com.intel.hibench.streambench.common.metrics
 
 trait LatencyReporter extends java.io.Serializable {
 
-  def report(latency: Long): Unit
+  def report(startTime: Long, endTime: Long): Unit
 
 }

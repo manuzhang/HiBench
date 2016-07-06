@@ -27,7 +27,6 @@ class Identity(taskContext: TaskContext, conf: UserConfig) extends Task(taskCont
 
   override def onNext(msg: Message): Unit = {
     taskContext.output(msg)
-    val latency = msg.timestamp - System.currentTimeMillis()
-    reporter.report(latency)
+    reporter.report(msg.timestamp, System.currentTimeMillis())
   }
 }

@@ -17,7 +17,7 @@
 
 package com.intel.hibench.streambench.common.metrics
 
-import java.io.File
+import java.io.{FileOutputStream, FileWriter, File}
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -26,18 +26,50 @@ import com.codahale.metrics.{CsvReporter, MetricRegistry}
 
 class KafkaCollector(name: String, consumer: KafkaConsumer, outputFile: String) extends LatencyCollector {
 
+  private var minTime = Long.MaxValue
+  private var maxTime = 0L
+  private var count = 0L
+  private val registry = new MetricRegistry
+  private val histogram = registry.histogram(name)
+  private val reporter = CsvReporter.forRegistry(registry)
+      .formatFor(Locale.US)
+      .convertRatesTo(TimeUnit.SECONDS)
+      .convertDurationsTo(TimeUnit.MILLISECONDS)
+      .build(new File(outputFile))
+
   def start(): Unit = {
-    val registry = new MetricRegistry
-    val histogram = registry.histogram(name)
-    val reporter = CsvReporter.forRegistry(registry)
-        .formatFor(Locale.US)
-        .convertRatesTo(TimeUnit.SECONDS)
-        .convertDurationsTo(TimeUnit.MILLISECONDS)
-        .build(new File(outputFile))
     reporter.start(1, TimeUnit.SECONDS)
+
     while (consumer.hasNext) {
-      val latency = new String(consumer.next(), "UTF-8").toLong
-      histogram.update(latency)
+      val times = new String(consumer.next(), "UTF-8").split(":")
+      val startTime = times(0).toLong
+      val endTime = times(1).toLong
+
+      updateLatency(startTime, endTime)
+      updateThroughput(startTime, endTime)
+    }
+
+    Thread.sleep(5000)
+
+    val throughputFile = new File(outputFile, name)
+    val outputStream = new FileOutputStream(throughputFile)
+    outputStream.write(s"Throughput: ${count * 1.0 / (maxTime - minTime)}".getBytes("UTF-8"))
+    outputStream.close()
+  }
+
+  private def updateLatency(startTime: Long, endTime: Long): Unit = {
+    histogram.update(endTime - startTime)
+  }
+
+  private def updateThroughput(startTime: Long ,endTime: Long): Unit = {
+    count += 1
+
+    if (startTime < minTime) {
+      minTime = startTime
+    }
+
+    if (endTime > maxTime) {
+      maxTime = endTime
     }
   }
 
