@@ -38,6 +38,7 @@ public abstract class SingleSpoutTops {
 
   private Config getConf() {
     Config conf = new Config();
+    conf.put(Config.TOPOLOGY_BACKPRESSURE_ENABLE, false);
     conf.setNumWorkers(config.workerCount);
     if (!config.ackon) {
       conf.setNumAckers(0);
