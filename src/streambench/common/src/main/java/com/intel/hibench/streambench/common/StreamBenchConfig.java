@@ -55,6 +55,7 @@ public class StreamBenchConfig {
 
   public static String DATAGEN_RECORD_LENGTH = "hibench.streambench.datagen.recordLength";
 
+  public static String DATAGEN_PRODUCER_NUMBER = "hibench.streambench.datagen.producerNumber";
   // =====================================
   // Spark Streaming Related Conf
   // =====================================
@@ -74,5 +75,19 @@ public class StreamBenchConfig {
   // Flink Related Conf
   // ======================================
   public static String FLINK_BUFFERTIMEOUT = "hibench.streambench.flink.bufferTimeout";
+
+  // ======================================
+  // Storm Related Conf
+  // ======================================
+  public static String STORM_WORKERCOUNT = "hibench.streambench.storm.worker_count";
+  public static String STORM_SPOUT_THREADS = "hibench.streambench.storm.spout_threads";
+  public static String STORM_BOLT_THREADS = "hibench.streambench.storm.bolt_threads";
+  public static String STORM_READ_FROM_START = "hibench.streambench.storm.read_from_start";
+  public static String STORM_ACKON = "hibench.streambench.storm.ackon";
+
+  // =====================================
+  // Gearpump Related Conf
+  // =====================================
+  public static String GEARPUMP_PARALLELISM = "hibench.streambench.gearpump.parallelism";
 
 }
